@@ -5,8 +5,6 @@ using int_ctx_t = CMD2::Context<int>;
 
 class Increment : public int_ctx_t::Command {
    public:
-      Increment() = default;
-      ~Increment() override = default;
       void operator()(int_ctx_t& ctx) override
       {
          ctx.get_state() += 1;
