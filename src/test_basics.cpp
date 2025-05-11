@@ -45,17 +45,18 @@ int main(int, char **)
 {
    using ::std::shared_ptr;
    using ::std::make_shared;
+   using ::std::cout;
 
    int_ctx_t test_ctx{0};
    test_ctx.queue_to_context().enqueue(make_shared<Increment>());
 
-   ::std::cout << "Before state: " << test_ctx.get_state() << '\n';
-   ::std::cout << "Num increment instances: " << Increment::num_instances_ << '\n';
+   cout << "Before state: " << test_ctx.get_state() << '\n';
+   cout << "Num increment instances: " << Increment::num_instances_ << '\n';
    ::std::jthread context_thread{&int_ctx_t::run, &test_ctx};
    test_ctx.queue_to_context().enqueue(make_shared<Stop>());
    context_thread.join();
-   ::std::cout << " After state: " << test_ctx.get_state() << '\n';
-   ::std::cout << "Num increment instances: " << Increment::num_instances_ << '\n';
-   ::std::cout << "Num stop instances: " << Stop::num_instances_ << '\n';
+   cout << " After state: " << test_ctx.get_state() << '\n';
+   cout << "Num increment instances: " << Increment::num_instances_ << '\n';
+   cout << "Num stop instances: " << Stop::num_instances_ << '\n';
    return 0;
 }
