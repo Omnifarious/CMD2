@@ -1,3 +1,5 @@
 [submodule "concurrentqueue"]
 	path = concurrentqueue
 	url = https://github.com/cameron314/concurrentqueue.git
+	path = concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue.git

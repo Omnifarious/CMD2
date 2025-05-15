@@ -12,6 +12,7 @@ class Context {
   public:
      class Command
      {
+      public:
        Command() = default;
        virtual ~Command() = default;
        virtual void operator()(Context &context) = 0;
