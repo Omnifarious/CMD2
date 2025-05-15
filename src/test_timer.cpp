@@ -8,6 +8,9 @@
 class TimerState {
  public:
    using tick_t = ::std::uint64_t;
+   class Tick;
+   friend class Tick;
+
  private:
    using cmd_ptr_t = ::std::shared_ptr<void>;
    tick_t tick_count_;
@@ -17,6 +20,11 @@ class TimerState {
 
 using ticker_ctx_t = ::CMD2::Context<TimerState>;
 
+// A Command that actually executes the tick on the TimerState.
+class TimerState::Tick : public ticker_ctx_t::Command {};
+
+
+// Holds the context for a thread that sends Tick Commands to the ticker_ctx_t
 class Ticker {
  public:
    // The context must live while the Ticker is alive.
