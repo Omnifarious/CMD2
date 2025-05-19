@@ -4,12 +4,16 @@
 #include <utility>
 #include <memory>
 #include <chrono>
+#include <iostream>
+
+int main(int, char **);
 
 class TimerState {
  public:
    using tick_t = ::std::uint64_t;
    class Tick;
    friend class Tick;
+   friend int main(int, char **);
 
  private:
    using cmd_ptr_t = ::std::shared_ptr<void>;
@@ -18,7 +22,7 @@ class TimerState {
    ::std::vector<log_entry_t> commandlog_;
 };
 
-using ticker_ctx_t = ::CMD2::Context<TimerState>;
+using ticker_ctx_t = ::CMD2::Context<TimerState>;  // a -> b -> c _> a   d -> c
 
 // A Command that actually executes the tick on the TimerState.
 class TimerState::Tick : public ticker_ctx_t::Command, ::std::enable_shared_from_this<Tick> {
@@ -29,10 +33,28 @@ class TimerState::Tick : public ticker_ctx_t::Command, ::std::enable_shared_from
       {
          auto &state = ctx.get_state();
          state.tick_count_++;
-         state.commandlog_.emplace_back(ctx.get_state().tick_count_, shared_from_this());
+         auto me = shared_from_this();
+         state.commandlog_.emplace_back(ctx.get_state().tick_count_, me);
       }
 };
 
+class Stop : public ticker_ctx_t::Command {
+   public:
+      Stop() {
+         ++num_instances_;
+      }
+      ~Stop() override {
+         --num_instances_;
+      }
+      void operator()(ticker_ctx_t& ctx) override
+      {
+         stop(ctx);
+      }
+
+      static ::std::atomic<int> num_instances_;
+};
+
+::std::atomic<int> Stop::num_instances_ = 0;
 
 // Holds the context for a thread that sends Tick Commands to the ticker_ctx_t
 class Ticker {
@@ -76,3 +98,24 @@ class Ticker {
    ::std::chrono::steady_clock::time_point last_tick_;
    ::std::jthread thread_;
 };
+
+int main(int, char **)
+{
+   using ::std::shared_ptr;
+   using ::std::make_shared;
+   using ::std::cout;
+   ticker_ctx_t test_ctx;
+
+   ::std::jthread context_thread{&ticker_ctx_t::run, &test_ctx};
+
+   Ticker ticker(100000, test_ctx);
+
+   ::std::this_thread::sleep_for(::std::chrono::seconds(10));
+
+   ticker.stop();
+
+   test_ctx.queue_to_context().enqueue(::std::make_shared<Stop>());
+   context_thread.join();
+   ::std::cout << "Tick count: " << test_ctx.get_state().tick_count_ << '\n';
+   return 0;
+}
