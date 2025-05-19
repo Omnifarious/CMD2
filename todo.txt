@@ -1,0 +1,4 @@
+
+[ ] make convieniece function for enque in Context
+[ ] Put a thread inside of Context
+[ ] finish the timer test, yes
