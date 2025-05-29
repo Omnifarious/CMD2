@@ -11,14 +11,15 @@ int main(int, char **);
 class TimerState {
  public:
    using tick_t = ::std::uint64_t;
+   using time_point_t = ::std::chrono::steady_clock::time_point;
    class Tick;
    friend class Tick;
    friend int main(int, char **);
 
  private:
    using cmd_ptr_t = ::std::shared_ptr<void>;
-   tick_t tick_count_;
-   using log_entry_t = ::std::pair<tick_t, cmd_ptr_t>;
+   tick_t tick_count_ = 0;
+   using log_entry_t = ::std::pair<time_point_t, cmd_ptr_t>;
    ::std::vector<log_entry_t> commandlog_;
 };
 
@@ -34,7 +35,7 @@ class TimerState::Tick : public ticker_ctx_t::Command, public ::std::enable_shar
          auto &state = ctx.get_state();
          state.tick_count_++;
          auto me = shared_from_this();
-         state.commandlog_.emplace_back(ctx.get_state().tick_count_, me);
+         state.commandlog_.emplace_back(::std::chrono::steady_clock::now(), me);
       }
 };
 
@@ -117,5 +118,9 @@ int main(int, char **)
    test_ctx.queue_to_context().enqueue(::std::make_shared<Stop>());
    context_thread.join();
    ::std::cout << "Tick count: " << test_ctx.get_state().tick_count_ << '\n';
+   for (auto const& entry : test_ctx.get_state().commandlog_) {
+      ::std::cout << "At: " << entry.first.time_since_epoch()
+                  << " Command: " << entry.second.get() << '\n';
+   }
    return 0;
 }
