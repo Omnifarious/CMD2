@@ -25,7 +25,7 @@ class TimerState {
 using ticker_ctx_t = ::CMD2::Context<TimerState>;  // a -> b -> c _> a   d -> c
 
 // A Command that actually executes the tick on the TimerState.
-class TimerState::Tick : public ticker_ctx_t::Command, ::std::enable_shared_from_this<Tick> {
+class TimerState::Tick : public ticker_ctx_t::Command, public ::std::enable_shared_from_this<Tick> {
    public:
       Tick() = default;
       ~Tick() override = default;
