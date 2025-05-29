@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../concurrentqueue/concurrentqueue.h"
+#include "../concurrentqueue/blockingconcurrentqueue.h"
 #include <memory>
 
 namespace CMD2 {
 
-using moodycamel::ConcurrentQueue;
+using moodycamel::BlockingConcurrentQueue;
 
 template <typename State>
 class Context {
@@ -31,9 +31,8 @@ class Context {
     {
       while (!should_stop_) {
         ::std::shared_ptr<Command> command;
-        if (incoming_commands_.try_dequeue(command)) {
-          (*command)(*this);
-        }
+        incoming_commands_.wait_dequeue(command);
+        (*command)(*this);
       }
     }
 
@@ -41,7 +40,7 @@ class Context {
 
   private:
     State state_;
-    ConcurrentQueue<::std::shared_ptr<Command>> incoming_commands_;
+    BlockingConcurrentQueue<::std::shared_ptr<Command>> incoming_commands_;
     bool should_stop_ = false;
 };
 
