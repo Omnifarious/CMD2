@@ -4,7 +4,7 @@
 #include <iostream>
 #include <atomic>
 
-using int_ctx_t = CMD2::Context<int>;
+using int_ctx_t = skythedragon::ACE::Context<int>;
 
 class Increment : public int_ctx_t::Command {
    public:

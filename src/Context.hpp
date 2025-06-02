@@ -3,7 +3,7 @@
 #include "../concurrentqueue/blockingconcurrentqueue.h"
 #include <memory>
 
-namespace CMD2 {
+namespace skythedragon::ACE {
 
 using moodycamel::BlockingConcurrentQueue;
 

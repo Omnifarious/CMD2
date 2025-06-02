@@ -23,7 +23,7 @@ class TimerState {
    ::std::vector<log_entry_t> commandlog_;
 };
 
-using ticker_ctx_t = ::CMD2::Context<TimerState>;  // a -> b -> c _> a   d -> c
+using ticker_ctx_t = ::skythedragon::ACE::Context<TimerState>;  // a -> b -> c _> a   d -> c
 
 // A Command that actually executes the tick on the TimerState.
 class TimerState::Tick : public ticker_ctx_t::Command, public ::std::enable_shared_from_this<Tick> {
