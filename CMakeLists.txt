@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION "3.30")
 cmake_minimum_required(VERSION 3.30)
 
 add_subdirectory(concurrentqueue)
-project (transistor_clicker VERSION 0.0.1 LANGUAGES CXX)
+project ("Asynchronous Command Engine" VERSION 0.0.1 LANGUAGES CXX)
 
 find_package(Threads REQUIRED)
 #find_package(PkgConfig REQUIRED)
